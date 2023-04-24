@@ -3,11 +3,23 @@
     padding: 0px;
 }
 
-.board {
+/* .board {
     display: grid;
     width: 300px;
     height: 300px;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 4px;
+} */
+
+.board {
+    display: grid;
+    width: 300px;
+    height: 300px;
+    grid-template-columns: 1fr 5px 1fr 5px 1fr;
+    grid-template-rows: 1fr 5px 1fr 5px 1fr;
+}
+
+.board .cross {
+    background-color: purple;
 }

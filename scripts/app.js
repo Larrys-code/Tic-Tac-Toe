@@ -200,6 +200,22 @@ const displayGame = (() => {
         board.appendChild(cell);
       }
     }
+    for (let columnIndex = 2; columnIndex < 5; columnIndex += 2) {
+      const cross = document.createElement("div");
+      cross.classList.add("cross");
+      cross.style.gridRow = "1/-1";
+      cross.style.gridColumn = `${columnIndex}/${columnIndex + 1}`;
+      cross.ariaHidden = true;
+      board.appendChild(cross);
+    }
+    for (let rowIndex = 2; rowIndex < 5; rowIndex += 2) {
+      const cross = document.createElement("div");
+      cross.classList.add("cross");
+      cross.style.gridColumn = "1/-1";
+      cross.style.gridRow = `${rowIndex}/${rowIndex + 1}`;
+      cross.ariaHidden = true;
+      board.appendChild(cross);
+    }
     container.appendChild(board);
   };
   return { renderNewBoard };
