@@ -34,15 +34,83 @@ const gameBoard = () => {
     }
     return true;
   };
-  const getBoard = () => board;
+  const getRawBoard = () => board;
   const getPOne = () => playerOne;
   const getPTwo = () => playerTwo;
-  return { getBoard, getPOne, getPTwo, playLegalMove };
+  return { getRawBoard, getPOne, getPTwo, playLegalMove };
 };
 
-const ticTacToe = () => {
+const ticTacToe = (() => {
+  let board = gameBoard();
+  let playerOneTurn = true;
   const playerOne = { name: "Player One", piece: "O" };
   const playerTwo = { name: "Player Two", piece: "X" };
+  const winningStates = [
+    [
+      [1, 1, 1],
+      [0, 0, 0],
+      [0, 0, 0],
+    ],
+    [
+      [0, 0, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+    [
+      [0, 0, 0],
+      [0, 0, 0],
+      [1, 1, 1],
+    ],
+    [
+      [1, 0, 0],
+      [1, 0, 0],
+      [1, 0, 0],
+    ],
+    [
+      [0, 1, 0],
+      [0, 1, 0],
+      [0, 1, 0],
+    ],
+    [
+      [0, 0, 1],
+      [0, 0, 1],
+      [0, 0, 1],
+    ],
+    [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+    ],
+    [
+      [0, 0, 1],
+      [0, 1, 0],
+      [1, 0, 0],
+    ],
+  ];
+
+  const resetGame = () => {
+    board = gameBoard();
+    return board;
+  };
+
+  const turnSwitch = () => {
+    switch (playerOneTurn) {
+      case true:
+        playerOneTurn = false;
+        break;
+      case false:
+        playerOneTurn = true;
+        break;
+      default:
+    }
+  };
+
+  const playTurn = (row, column) => {
+    if (board.playLegalMove(row, column, playerOneTurn)) {
+      turnSwitch();
+    }
+  };
+
   const setPlayerOne = (name, piece) => {
     playerOne.name = name;
     playerOne.piece = piece;
@@ -51,6 +119,43 @@ const ticTacToe = () => {
     playerTwo.name = name;
     playerTwo.piece = piece;
   };
-  const board = gameBoard();
-  return { setPlayerOne, setPlayerTwo };
-};
+
+  const getBoard = () => {
+    const fullBoard = board.getRawBoard();
+    const playerTwoBoard = board.getPTwo();
+    fullBoard.forEach((row, rowIndex) => {
+      const playerTwoRow = playerTwoBoard[rowIndex];
+      row.forEach((cell, columnIndex) => {
+        if (cell === 1 && cell === playerTwoRow[columnIndex])
+          row.splice(columnIndex, 1, 2);
+      });
+    });
+    return fullBoard;
+  };
+
+  const checkDraw = () => {
+    if (
+      board.getRawBoard() ===
+      [
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
+      ]
+    )
+      return true;
+    return false;
+  };
+
+  const checkWin = () => {
+    const players = [
+      [playerOne, board.getPOne],
+      [playerTwo, board.getPTwo],
+    ];
+    players.forEach((playerArray) => {
+      if (playerArray[1] === [[], [], []]) return playerArray[0];
+    });
+    return false;
+  };
+
+  return { playTurn, resetGame, getBoard, setPlayerOne, setPlayerTwo };
+})();
