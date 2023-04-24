@@ -40,7 +40,7 @@ const gameBoard = () => {
   return { getRawBoard, getPOne, getPTwo, playLegalMove };
 };
 
-const ticTacToe = (() => {
+const gameController = () => {
   let board = gameBoard();
   let playerOneTurn = true;
   const playerOne = { name: "Player One", piece: "O" };
@@ -179,15 +179,17 @@ const ticTacToe = (() => {
     resetGame,
     getBoard,
     checkWin,
+    checkDraw,
     setPlayerOne,
     setPlayerTwo,
   };
-})();
-ticTacToe.playTurn(2, 2);
-ticTacToe.playTurn(0, 0);
-ticTacToe.playTurn(0, 1);
-ticTacToe.playTurn(1, 0);
-ticTacToe.playTurn(1, 1);
-ticTacToe.playTurn(2, 0);
-console.log(ticTacToe.getBoard());
-console.log(ticTacToe.checkWin());
+};
+
+const diplayGame = () => {
+  const ticTacToe = gameController();
+  const newGame = () => {
+    ticTacToe.resetGame();
+    ticTacToe.getBoard();
+  };
+  return { newGame };
+};
