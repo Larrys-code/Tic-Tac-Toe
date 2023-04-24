@@ -170,7 +170,7 @@ const ticTacToe = (() => {
       )
         winner.push(playerArray[0]);
     });
-    if (winner[0]) return winner;
+    if (winner[0]) return winner[0];
     return false;
   };
 
@@ -183,10 +183,11 @@ const ticTacToe = (() => {
     setPlayerTwo,
   };
 })();
+ticTacToe.playTurn(2, 2);
 ticTacToe.playTurn(0, 0);
 ticTacToe.playTurn(0, 1);
 ticTacToe.playTurn(1, 0);
 ticTacToe.playTurn(1, 1);
-// ticTacToe.playTurn(2, 0);
+ticTacToe.playTurn(2, 0);
 console.log(ticTacToe.getBoard());
 console.log(ticTacToe.checkWin());
