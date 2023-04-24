@@ -87,7 +87,6 @@ const ticTacToe = (() => {
       [1, 0, 0],
     ],
   ];
-
   const resetGame = () => {
     board = gameBoard();
     return board;
@@ -148,14 +147,46 @@ const ticTacToe = (() => {
 
   const checkWin = () => {
     const players = [
-      [playerOne, board.getPOne],
-      [playerTwo, board.getPTwo],
+      [playerOne, board.getPOne()],
+      [playerTwo, board.getPTwo()],
     ];
+    const winner = [];
     players.forEach((playerArray) => {
-      if (playerArray[1] === [[], [], []]) return playerArray[0];
+      const playerBoard = playerArray[1];
+      const winStates = JSON.parse(JSON.stringify(winningStates));
+      winStates.forEach((winState) => {
+        winState.forEach((winStateRow, rowIndex) => {
+          winStateRow.forEach((cell, columnIndex) => {
+            if (cell === 1 && playerBoard[rowIndex][columnIndex] === 1) {
+              winStateRow.splice(columnIndex, 1, 0);
+            }
+          });
+        });
+      });
+      if (
+        winStates.some((winState) =>
+          winState.every((row) => row.every((cell) => cell === 0))
+        )
+      )
+        winner.push(playerArray[0]);
     });
+    if (winner[0]) return winner;
     return false;
   };
 
-  return { playTurn, resetGame, getBoard, setPlayerOne, setPlayerTwo };
+  return {
+    playTurn,
+    resetGame,
+    getBoard,
+    checkWin,
+    setPlayerOne,
+    setPlayerTwo,
+  };
 })();
+ticTacToe.playTurn(0, 0);
+ticTacToe.playTurn(0, 1);
+ticTacToe.playTurn(1, 0);
+ticTacToe.playTurn(1, 1);
+// ticTacToe.playTurn(2, 0);
+console.log(ticTacToe.getBoard());
+console.log(ticTacToe.checkWin());
