@@ -185,11 +185,24 @@ const gameController = () => {
   };
 };
 
-const diplayGame = () => {
+const displayGame = (() => {
   const ticTacToe = gameController();
-  const newGame = () => {
-    ticTacToe.resetGame();
-    ticTacToe.getBoard();
+  const container = document.querySelector(".container");
+  const renderNewBoard = () => {
+    const board = document.createElement("div");
+    board.classList.add("board");
+    for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
+      for (let columnIndex = 0; columnIndex < 3; columnIndex += 1) {
+        const cell = document.createElement("button");
+        cell.classList.add("cell");
+        cell.dataset.row = rowIndex;
+        cell.dataset.column = columnIndex;
+        board.appendChild(cell);
+      }
+    }
+    container.appendChild(board);
   };
-  return { newGame };
-};
+  return { renderNewBoard };
+})();
+
+displayGame.renderNewBoard();
