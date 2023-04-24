@@ -1,25 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Dongle:wght@300;400&family=Roboto:wght@300;400;500;700&display=swap');
+
 * {
     margin: 0px;
     padding: 0px;
 }
 
-/* .board {
+.container {
+    height: 100vh;
     display: grid;
-    width: 300px;
-    height: 300px;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 4px;
-} */
+    place-items: center;
+}
 
 .board {
     display: grid;
     width: 300px;
     height: 300px;
-    grid-template-columns: 1fr 5px 1fr 5px 1fr;
-    grid-template-rows: 1fr 5px 1fr 5px 1fr;
+    grid-template-columns: 1fr repeat(2, 8px 1fr);
+    grid-template-rows: 1fr repeat(2, 8px 1fr);
+}
+
+.board .cell {
+    display: grid;
+    place-items: center;
+    line-height: 0%;
+    font-family: Dongle, sans-serif;
+    font-weight: 300;
+    font-size: 170px;
+    background-color: transparent;
+    border-style: none;
+    overflow: hidden;
+}
+
+.board .cell.hover {
+    opacity: 50%;
+}
+
+.board .cell.x {
+    color: red;
 }
 
 .board .cross {
-    background-color: purple;
+    border-radius: 4px;
+    background-color: darkgray;
+}
+
+.board .cross.x {
+    transform: scaleX(103%);
+}
+
+.board .cross.y {
+    transform: scaleY(103%);
 }

@@ -37,14 +37,14 @@ const gameBoard = () => {
   const getRawBoard = () => board;
   const getPOne = () => playerOne;
   const getPTwo = () => playerTwo;
-  return { getRawBoard, getPOne, getPTwo, playLegalMove };
+  return { getRawBoard, getPOne, getPTwo, playLegalMove, checkLegal };
 };
 
 const gameController = () => {
   let board = gameBoard();
   let playerOneTurn = true;
-  const playerOne = { name: "Player One", piece: "O" };
-  const playerTwo = { name: "Player Two", piece: "X" };
+  const playerOne = { name: "Player One", piece: "o" };
+  const playerTwo = { name: "Player Two", piece: "x" };
   const winningStates = [
     [
       [1, 1, 1],
@@ -104,10 +104,23 @@ const gameController = () => {
     }
   };
 
+  const whosTurn = () => {
+    switch (playerOneTurn) {
+      case true:
+        return playerOne;
+      case false:
+        return playerTwo;
+      default:
+        return playerOne;
+    }
+  };
+
   const playTurn = (row, column) => {
     if (board.playLegalMove(row, column, playerOneTurn)) {
       turnSwitch();
+      return true;
     }
+    return false;
   };
 
   const setPlayerOne = (name, piece) => {
@@ -133,15 +146,8 @@ const gameController = () => {
   };
 
   const checkDraw = () => {
-    if (
-      board.getRawBoard() ===
-      [
-        [1, 1, 1],
-        [1, 1, 1],
-        [1, 1, 1],
-      ]
-    )
-      return true;
+    const rawBoard = board.getRawBoard();
+    if (rawBoard.every((row) => row.every((cell) => cell === 1))) return true;
     return false;
   };
 
@@ -176,6 +182,7 @@ const gameController = () => {
 
   return {
     playTurn,
+    whosTurn,
     resetGame,
     getBoard,
     checkWin,
@@ -188,21 +195,65 @@ const gameController = () => {
 const displayGame = (() => {
   const ticTacToe = gameController();
   const container = document.querySelector(".container");
+  const checkState = () => {
+    if (ticTacToe.checkWin()) {
+      return console.log(ticTacToe.checkWin());
+    }
+    if (ticTacToe.checkDraw()) {
+      return console.log("Draw");
+    }
+    return false;
+  };
+  const handleCellClick = (cell) => {
+    const { row, column } = cell.dataset;
+    const player = ticTacToe.whosTurn();
+    if (ticTacToe.playTurn(row, column)) {
+      cell.textContent = `${player.piece}`;
+      cell.classList.remove("hover");
+      cell.classList.add("filled");
+      cell.classList.add(`${player.piece}`);
+      checkState();
+    }
+  };
+  const handleCellHover = (cell) => {
+    if (!cell.classList.contains("filled")) {
+      const player = ticTacToe.whosTurn();
+      cell.classList.toggle("hover");
+      cell.classList.toggle(`${player.piece}`);
+      if (!cell.textContent) {
+        cell.textContent = `${player.piece}`;
+      } else {
+        cell.textContent = "";
+      }
+    }
+  };
   const renderNewBoard = () => {
     const board = document.createElement("div");
     board.classList.add("board");
+    // add buttons
     for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
       for (let columnIndex = 0; columnIndex < 3; columnIndex += 1) {
         const cell = document.createElement("button");
         cell.classList.add("cell");
         cell.dataset.row = rowIndex;
         cell.dataset.column = columnIndex;
+        cell.addEventListener("click", () => {
+          handleCellClick(cell);
+        });
+        cell.addEventListener("mouseover", () => {
+          handleCellHover(cell);
+        });
+        cell.addEventListener("mouseout", () => {
+          handleCellHover(cell);
+        });
         board.appendChild(cell);
       }
     }
+    // add hash grid
     for (let columnIndex = 2; columnIndex < 5; columnIndex += 2) {
       const cross = document.createElement("div");
       cross.classList.add("cross");
+      cross.classList.add("y");
       cross.style.gridRow = "1/-1";
       cross.style.gridColumn = `${columnIndex}/${columnIndex + 1}`;
       cross.ariaHidden = true;
@@ -211,6 +262,7 @@ const displayGame = (() => {
     for (let rowIndex = 2; rowIndex < 5; rowIndex += 2) {
       const cross = document.createElement("div");
       cross.classList.add("cross");
+      cross.classList.add("x");
       cross.style.gridColumn = "1/-1";
       cross.style.gridRow = `${rowIndex}/${rowIndex + 1}`;
       cross.ariaHidden = true;
