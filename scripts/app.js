@@ -200,7 +200,6 @@ const gameController = () => {
 };
 
 // To do:
-// Scoreboard with turn indicator
 // Change sides and Next match buttons
 // Win/Lose/Draw indicator
 // Move board to one array
@@ -332,10 +331,35 @@ const displayGame = (() => {
     }
     container.appendChild(board);
   };
+  const renderBoardControls = () => {
+    const boardControls = document.createElement("div");
+    const newMatchButton = document.createElement("button");
+    const exitButton = document.createElement("button");
+
+    boardControls.classList.add("board-controls");
+    newMatchButton.classList.add("new-match");
+    exitButton.classList.add("exit");
+
+    exitButton.textContent = "exit";
+    newMatchButton.textContent = "new match";
+
+    newMatchButton.addEventListener("click", () => {
+      const board = document.querySelector(".board");
+      container.removeChild(board);
+      container.removeChild(boardControls);
+      renderNewBoard();
+      renderBoardControls();
+    });
+
+    boardControls.appendChild(exitButton);
+    boardControls.appendChild(newMatchButton);
+    container.appendChild(boardControls);
+  };
   const renderNewGame = () => {
     container.textContent = "";
     renderScoreboard();
     renderNewBoard();
+    renderBoardControls();
   };
   return { renderNewGame };
 })();
