@@ -5,13 +5,26 @@
     padding: 0px;
 }
 
+html {
+    --red: #EF4444;
+    --blue: #0EA5E9;
+    --grey: #A3A3A3;
+}
+
 .container {
     height: 100vh;
     display: grid;
     place-items: center;
 }
 
+.cover {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
 .board {
+    position: relative;
     display: grid;
     width: 300px;
     height: 300px;
@@ -36,12 +49,20 @@
 }
 
 .board .cell.x {
-    color: red;
+    color: var(--red);
+}
+
+.board .cell.o {
+    color: var(--blue);
+}
+
+.board .cell.filled {
+    animation: place 0.3s cubic-bezier(0.72, 1.21, 0.91, 0.73);
 }
 
 .board .cross {
     border-radius: 4px;
-    background-color: darkgray;
+    background-color: var(--grey);
 }
 
 .board .cross.x {
@@ -50,4 +71,25 @@
 
 .board .cross.y {
     transform: scaleY(103%);
+}
+
+@keyframes place {
+    0% {
+        opacity: 50%;
+        transform: scale(80%);
+    }
+    10% {
+        transform: scale(50%);
+    }
+    70% {
+        opacity: 100%;
+        transform: scale(125%);
+    }
+    80% {
+        transform: scale(120%);
+    }
+    100% {
+        opacity: 100%;
+        transform: scale(100%);
+    }
 }
