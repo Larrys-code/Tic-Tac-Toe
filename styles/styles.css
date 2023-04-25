@@ -92,6 +92,29 @@ html {
     height: 100%;
     width: 100%;
     position: absolute;
+    display: grid;
+    place-content: center;
+    /* overflow: hidden; */
+}
+
+.result {
+    font-family: Dongle;
+    opacity: 0%;
+    line-height: 60%;
+    font-weight: 300;
+    font-size: 70px;
+    padding: 30px 40px 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 50%);
+    height: min-content;
+    width: min-content;
+    text-align: center;
+    animation-name: fly-in, wait-here, fly-out;
+    animation-duration: 1s, 2s, 0.7s;
+    animation-delay: 0ms, 1s, 3s; /* add this */
+    animation-timing-function: cubic-bezier(0.24, 1.05, 0.51, 0.96), ease-in, cubic-bezier(0.56, 0.04, 0.66,-0.02);
+    animation-iteration-count: 1, 1, 1;
 }
 
 .board {
@@ -163,4 +186,40 @@ html {
         opacity: 100%;
         transform: scale(100%);
     }
+}
+@keyframes fly-in {
+    0% {
+        transform: translateY(200%);
+        opacity: 0%;
+    }
+    60% {
+        opacity: 100%;
+    }
+    100% {
+        opacity: 100%;
+        transform: translateY(0%);
+    }
+}
+@keyframes wait-here {
+    0% {
+        opacity: 100%;
+        transform: translateY(0%);
+    }
+    100% {
+        opacity: 100%;
+        transform: translateY(0%);
+    }
+}
+@keyframes fly-out {
+    0% {
+        opacity: 100%;
+        transform: translateY(0%);
+    }
+    90% {
+        opacity: 0%;
+    }
+    100% {
+        opacity: 0%;
+        transform: translateY(-200%);
+    }  
 }
