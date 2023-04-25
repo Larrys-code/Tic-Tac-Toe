@@ -89,6 +89,7 @@ const gameController = () => {
   ];
   const resetGame = () => {
     board = gameBoard();
+    playerOneTurn = true;
     return board;
   };
 
@@ -200,7 +201,7 @@ const gameController = () => {
 };
 
 // To do:
-// Change sides and Next match buttons
+// Change sides button
 // Win/Lose/Draw indicator
 // Move board to one array
 // AI
