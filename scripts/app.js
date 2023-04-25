@@ -208,11 +208,19 @@ const gameController = () => {
 const displayGame = (() => {
   const ticTacToe = gameController();
   const container = document.querySelector(".container");
-  const addCover = () => {
+  const addResultCover = (result) => {
     const board = document.querySelector(".board");
     const cover = document.createElement("div");
     cover.classList.add("cover");
     board.appendChild(cover);
+    const card = document.createElement("div");
+    card.classList.add("result");
+    if (result === "draw") {
+      card.textContent = "You Drew";
+    } else {
+      card.textContent = `${result} Won!`;
+    }
+    cover.appendChild(card);
   };
   const renderScore = () => {
     const playerOne = ticTacToe.getPlayerOne();
@@ -254,12 +262,12 @@ const displayGame = (() => {
   };
   const checkState = () => {
     if (ticTacToe.checkWin()) {
-      addCover();
+      addResultCover(ticTacToe.checkWin().name);
       ticTacToe.checkWin().score += 1;
       return renderScore();
     }
     if (ticTacToe.checkDraw()) {
-      addCover();
+      addResultCover("draw");
       return console.log("Draw");
     }
     return false;
@@ -350,6 +358,10 @@ const displayGame = (() => {
       container.removeChild(boardControls);
       renderNewBoard();
       renderBoardControls();
+      const playerTwoContainer = document.querySelector(".player-tag-2");
+      if (playerTwoContainer.classList.contains("is-turn")) {
+        toggleDisplayTurn();
+      }
     });
 
     boardControls.appendChild(exitButton);
