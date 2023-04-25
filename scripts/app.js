@@ -220,6 +220,12 @@ const displayGame = (() => {
     const score = document.querySelector(".score");
     score.textContent = `${playerOne.score} : ${playerTwo.score}`;
   };
+  const toggleDisplayTurn = () => {
+    const playerOneContainer = document.querySelector(".player-tag-1");
+    const playerTwoContainer = document.querySelector(".player-tag-2");
+    playerOneContainer.classList.toggle("is-turn");
+    playerTwoContainer.classList.toggle("is-turn");
+  };
   const renderScoreboard = () => {
     const scoreboard = document.createElement("div");
     scoreboard.classList.add("scoreboard");
@@ -230,7 +236,11 @@ const displayGame = (() => {
       const playerPiece = document.createElement("div");
       const playerName = document.createElement("h1");
       playerContainer.classList.add(`player-tag-${player.is}`);
+      if (player === playerOne) {
+        playerContainer.classList.add("is-turn");
+      }
       playerPiece.textContent = `${player.piece}`;
+      playerPiece.classList.add("marker");
       playerName.textContent = `${player.name}`;
       playerContainer.appendChild(playerPiece);
       playerContainer.appendChild(playerName);
@@ -262,6 +272,7 @@ const displayGame = (() => {
       cell.classList.remove("hover");
       cell.classList.add("filled");
       cell.classList.add(`${player.piece}`);
+      toggleDisplayTurn();
       checkState();
     }
   };
@@ -322,6 +333,7 @@ const displayGame = (() => {
     container.appendChild(board);
   };
   const renderNewGame = () => {
+    container.textContent = "";
     renderScoreboard();
     renderNewBoard();
   };
