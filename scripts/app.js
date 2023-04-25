@@ -195,11 +195,19 @@ const gameController = () => {
 const displayGame = (() => {
   const ticTacToe = gameController();
   const container = document.querySelector(".container");
+  const addCover = () => {
+    const board = document.querySelector(".board");
+    const cover = document.createElement("div");
+    cover.classList.add("cover");
+    board.appendChild(cover);
+  };
   const checkState = () => {
     if (ticTacToe.checkWin()) {
+      addCover();
       return console.log(ticTacToe.checkWin());
     }
     if (ticTacToe.checkDraw()) {
+      addCover();
       return console.log("Draw");
     }
     return false;
