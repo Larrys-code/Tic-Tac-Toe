@@ -12,10 +12,13 @@ html {
 }
 
 .container {
+    min-height: 650px;
     height: 100vh;
     display: grid;
-    place-items: center;
-    align-content: space-evenly;
+    gap: 80px;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
 }
 
 .scoreboard {
@@ -165,6 +168,34 @@ html {
 
 .board .cross.y {
     transform: scaleY(103%);
+}
+
+.board-controls {
+    width: 50%;
+    display: grid;
+    grid-template-columns: 190px minmax(50px, 300px) 190px;
+    justify-content: center;
+}
+
+.board-controls button {
+    cursor: pointer;
+    font-family: Dongle;
+    font-weight: 300;
+    font-size: 40px;
+    line-height: 70%;
+    padding: 13px 30px 10px;
+    border-radius: 10px;
+    border-style: none;
+    color: white;
+}
+
+.board-controls .exit {
+    background-color: var(--grey);
+}
+
+.board-controls .new-match {
+    grid-column: 3/4;
+    background-color: var(--blue);
 }
 
 @keyframes place {
