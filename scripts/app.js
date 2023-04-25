@@ -43,8 +43,8 @@ const gameBoard = () => {
 const gameController = () => {
   let board = gameBoard();
   let playerOneTurn = true;
-  const playerOne = { name: "Player One", piece: "o" };
-  const playerTwo = { name: "Player Two", piece: "x" };
+  const playerOne = { name: "Player One", piece: "o", score: 0, is: 1 };
+  const playerTwo = { name: "Player Two", piece: "x", score: 0, is: 2 };
   const winningStates = [
     [
       [1, 1, 1],
@@ -126,11 +126,16 @@ const gameController = () => {
   const setPlayerOne = (name, piece) => {
     playerOne.name = name;
     playerOne.piece = piece;
+    playerOne.score = 0;
   };
   const setPlayerTwo = (name, piece) => {
     playerTwo.name = name;
     playerTwo.piece = piece;
+    playerTwo.score = 0;
   };
+
+  const getPlayerOne = () => playerOne;
+  const getPlayerTwo = () => playerTwo;
 
   const getBoard = () => {
     const fullBoard = board.getRawBoard();
@@ -189,9 +194,17 @@ const gameController = () => {
     checkDraw,
     setPlayerOne,
     setPlayerTwo,
+    getPlayerOne,
+    getPlayerTwo,
   };
 };
 
+// To do:
+// Scoreboard with turn indicator
+// Change sides and Next match buttons
+// Win/Lose/Draw indicator
+// Move board to one array
+// AI
 const displayGame = (() => {
   const ticTacToe = gameController();
   const container = document.querySelector(".container");
@@ -201,10 +214,39 @@ const displayGame = (() => {
     cover.classList.add("cover");
     board.appendChild(cover);
   };
+  const renderScore = () => {
+    const playerOne = ticTacToe.getPlayerOne();
+    const playerTwo = ticTacToe.getPlayerTwo();
+    const score = document.querySelector(".score");
+    score.textContent = `${playerOne.score} : ${playerTwo.score}`;
+  };
+  const renderScoreboard = () => {
+    const scoreboard = document.createElement("div");
+    scoreboard.classList.add("scoreboard");
+    const playerOne = ticTacToe.getPlayerOne();
+    const playerTwo = ticTacToe.getPlayerTwo();
+    [playerOne, playerTwo].forEach((player) => {
+      const playerContainer = document.createElement("div");
+      const playerPiece = document.createElement("div");
+      const playerName = document.createElement("h1");
+      playerContainer.classList.add(`player-tag-${player.is}`);
+      playerPiece.textContent = `${player.piece}`;
+      playerName.textContent = `${player.name}`;
+      playerContainer.appendChild(playerPiece);
+      playerContainer.appendChild(playerName);
+      scoreboard.appendChild(playerContainer);
+    });
+    const score = document.createElement("div");
+    score.classList.add("score");
+    scoreboard.appendChild(score);
+    container.appendChild(scoreboard);
+    renderScore();
+  };
   const checkState = () => {
     if (ticTacToe.checkWin()) {
       addCover();
-      return console.log(ticTacToe.checkWin());
+      ticTacToe.checkWin().score += 1;
+      return renderScore();
     }
     if (ticTacToe.checkDraw()) {
       addCover();
@@ -236,6 +278,7 @@ const displayGame = (() => {
     }
   };
   const renderNewBoard = () => {
+    ticTacToe.resetGame();
     const board = document.createElement("div");
     board.classList.add("board");
     // add buttons
@@ -278,7 +321,11 @@ const displayGame = (() => {
     }
     container.appendChild(board);
   };
-  return { renderNewBoard };
+  const renderNewGame = () => {
+    renderScoreboard();
+    renderNewBoard();
+  };
+  return { renderNewGame };
 })();
 
-displayGame.renderNewBoard();
+displayGame.renderNewGame();
