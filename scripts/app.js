@@ -209,7 +209,58 @@ const aiPlayer = (ticTacToe) => {
   const findBestMove = (board) => {
     const free = freeSpaces(board);
     const nextTurn = free.length % 2 === 0 ? 2 : 1;
-    if (free.length === 9) return [[{ row: 0, col: 0 }], [], []];
+    if (free.length === 9)
+      return [
+        [],
+        [
+          {
+            row: 0,
+            col: 0,
+            score: 0,
+          },
+          {
+            row: 0,
+            col: 1,
+            score: 0,
+          },
+          {
+            row: 0,
+            col: 2,
+            score: 0,
+          },
+          {
+            row: 1,
+            col: 0,
+            score: 0,
+          },
+          {
+            row: 1,
+            col: 1,
+            score: 0,
+          },
+          {
+            row: 1,
+            col: 2,
+            score: 0,
+          },
+          {
+            row: 2,
+            col: 0,
+            score: 0,
+          },
+          {
+            row: 2,
+            col: 1,
+            score: 0,
+          },
+          {
+            row: 2,
+            col: 2,
+            score: 0,
+          },
+        ],
+        [],
+      ];
     free.forEach((cell) => {
       const newBoard = JSON.parse(JSON.stringify(board));
       newBoard[cell.row][cell.col] = nextTurn;
@@ -275,10 +326,18 @@ const aiPlayer = (ticTacToe) => {
     }
     const maybeMove =
       moves[secondChoice].length > 0
-        ? moves[secondChoice][0]
-        : moves[lastChoice][0];
+        ? moves[secondChoice][
+            Math.floor(Math.random() * moves[secondChoice].length)
+          ]
+        : moves[lastChoice][
+            Math.floor(Math.random() * moves[lastChoice].length)
+          ];
     const move =
-      moves[firstChoice].length > 0 ? moves[firstChoice][0] : maybeMove;
+      moves[firstChoice].length > 0
+        ? moves[firstChoice][
+            Math.floor(Math.random() * moves[firstChoice].length)
+          ]
+        : maybeMove;
     ticTacToe.playTurn(move.row, move.col);
     return [move.row, move.col];
   };
@@ -286,8 +345,6 @@ const aiPlayer = (ticTacToe) => {
   return { setAIPlayer, getAIPlayer, playTurn, difficulty };
 };
 
-// To do:
-// AI
 const displayGame = (() => {
   const ticTacToe = gameController();
   const container = document.querySelector(".container");
