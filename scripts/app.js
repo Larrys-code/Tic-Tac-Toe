@@ -440,16 +440,18 @@ const displayGame = (() => {
       checkState();
     }
   };
-  const handleCellHover = (cell) => {
+  const handleCellHover = (cell, hoverIn = true) => {
     if (!cell.classList.contains("filled")) {
       const player = ticTacToe.whosTurn();
       if (player.is !== ai.getAIPlayer()) {
-        cell.classList.toggle("hover");
-        cell.classList.toggle(`${player.piece}`);
-        if (!cell.textContent) {
+        if (hoverIn) {
+          cell.classList.add("hover");
+          cell.classList.add(`${player.piece}`);
           // eslint-disable-next-line no-param-reassign
           cell.textContent = `${player.piece}`;
         } else {
+          cell.classList.remove("hover");
+          cell.classList.remove(`${player.piece}`);
           // eslint-disable-next-line no-param-reassign
           cell.textContent = "";
         }
@@ -460,7 +462,6 @@ const displayGame = (() => {
     ticTacToe.resetGame();
     const board = document.createElement("div");
     board.classList.add("board");
-    // add buttons
     for (let rowIndex = 0; rowIndex < 3; rowIndex += 1) {
       for (let columnIndex = 0; columnIndex < 3; columnIndex += 1) {
         const cell = document.createElement("button");
@@ -478,12 +479,11 @@ const displayGame = (() => {
           handleCellHover(cell);
         });
         cell.addEventListener("mouseout", () => {
-          handleCellHover(cell);
+          handleCellHover(cell, false);
         });
         board.appendChild(cell);
       }
     }
-    // add hash grid
     for (let columnIndex = 2; columnIndex < 5; columnIndex += 2) {
       const cross = document.createElement("div");
       cross.classList.add("cross");
