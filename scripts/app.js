@@ -129,16 +129,14 @@ const gameController = () => {
     return fullBoard;
   };
 
-  const checkDraw = () => {
-    const rawBoard = board.getBoard();
+  const checkDraw = (rawBoard = board.getBoard()) => {
     if (rawBoard.every((row) => row.every((cell) => cell === 1 || cell === 2)))
       return true;
     return false;
   };
 
-  const checkWin = () => {
+  const checkWin = (rawBoard = board.getBoard()) => {
     const players = [playerOne, playerTwo];
-    const rawBoard = board.getBoard();
     const winner = [];
     players.forEach((player) => {
       const playerNumber = player.is;
@@ -180,12 +178,120 @@ const gameController = () => {
   };
 };
 
+const aiPlayer = (ticTacToe) => {
+  let is = 0;
+  let difficulty = "hard";
+
+  const setAIPlayer = (playeris, setDifficulty = "hard") => {
+    is = playeris;
+    difficulty = setDifficulty;
+  };
+
+  const getAIPlayer = () => is;
+
+  const freeSpaces = (board) => {
+    const freeSpace = [];
+    board.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        if (cell === 0)
+          freeSpace.push({
+            row: rowIndex,
+            col: columnIndex,
+            setScore: function setTheScore(score) {
+              this.score = score;
+            },
+          });
+      });
+    });
+    return freeSpace;
+  };
+
+  const findBestMove = (board) => {
+    const free = freeSpaces(board);
+    const nextTurn = free.length % 2 === 0 ? 2 : 1;
+    if (free.length === 9) return [[{ row: 0, col: 0 }], [], []];
+    free.forEach((cell) => {
+      const newBoard = JSON.parse(JSON.stringify(board));
+      newBoard[cell.row][cell.col] = nextTurn;
+      if (ticTacToe.checkWin(newBoard) || ticTacToe.checkDraw(newBoard)) {
+        if (ticTacToe.checkDraw(newBoard)) {
+          cell.setScore(0);
+        }
+        if (ticTacToe.checkWin(newBoard)) {
+          switch (ticTacToe.checkWin(newBoard).is === is) {
+            case true:
+              cell.setScore(1);
+              break;
+            default:
+              cell.setScore(-1);
+          }
+        }
+      } else {
+        const nextScores = findBestMove(newBoard);
+        if (is === nextTurn) {
+          const maybeScore = nextScores[1].length > 0 ? 0 : 1;
+          const score = nextScores[2].length > 0 ? -1 : maybeScore;
+          cell.setScore(score);
+        } else {
+          const maybeScore = nextScores[1].length > 0 ? 0 : -1;
+          const score = nextScores[0].length > 0 ? 1 : maybeScore;
+          cell.setScore(score);
+        }
+      }
+    });
+    const winning = free.filter((cell) => cell.score === 1);
+    const drawing = free.filter((cell) => cell.score === 0);
+    const losing = free.filter((cell) => cell.score === -1);
+    return [winning, drawing, losing];
+  };
+
+  const playTurn = () => {
+    const rawBoard = ticTacToe.getBoard();
+    const board = JSON.parse(JSON.stringify(rawBoard));
+    const moves = findBestMove(board);
+    let firstChoice;
+    let secondChoice;
+    let lastChoice;
+    const choiceArray = [0, 1, 2];
+    switch (difficulty) {
+      case "hard":
+        firstChoice = 0;
+        secondChoice = 1;
+        lastChoice = 2;
+        break;
+      case "medium":
+        for (let i = choiceArray.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [choiceArray[i], choiceArray[j]] = [choiceArray[j], choiceArray[i]];
+        }
+        [firstChoice, secondChoice, lastChoice] = choiceArray;
+        break;
+      case "easy":
+        firstChoice = 2;
+        secondChoice = 1;
+        lastChoice = 0;
+        break;
+      default:
+    }
+    const maybeMove =
+      moves[secondChoice].length > 0
+        ? moves[secondChoice][0]
+        : moves[lastChoice][0];
+    const move =
+      moves[firstChoice].length > 0 ? moves[firstChoice][0] : maybeMove;
+    ticTacToe.playTurn(move.row, move.col);
+    return [move.row, move.col];
+  };
+
+  return { setAIPlayer, getAIPlayer, playTurn, difficulty };
+};
+
 // To do:
-// Move board to one array
 // AI
 const displayGame = (() => {
   const ticTacToe = gameController();
   const container = document.querySelector(".container");
+  const ai = aiPlayer(ticTacToe);
   const addResultCover = (result) => {
     const board = document.querySelector(".board");
     const cover = document.createElement("div");
@@ -249,9 +355,24 @@ const displayGame = (() => {
     }
     return false;
   };
+  const handleAIMove = () => {
+    if (!ticTacToe.checkWin() && !ticTacToe.checkDraw()) {
+      const player = ticTacToe.whosTurn();
+      const [row, column] = ai.playTurn();
+      const cell = document.querySelector(
+        `[data-row = "${row}"][data-column = "${column}"]`
+      );
+      cell.classList.add("filled");
+      cell.classList.add(`${player.piece}`);
+      cell.textContent = `${player.piece}`;
+      toggleDisplayTurn();
+      checkState();
+    }
+  };
   const handleCellClick = (cell) => {
     const { row, column } = cell.dataset;
     const player = ticTacToe.whosTurn();
+    if (player.is === ai.getAIPlayer()) return;
     if (ticTacToe.playTurn(row, column)) {
       // eslint-disable-next-line no-param-reassign
       cell.textContent = `${player.piece}`;
@@ -265,14 +386,16 @@ const displayGame = (() => {
   const handleCellHover = (cell) => {
     if (!cell.classList.contains("filled")) {
       const player = ticTacToe.whosTurn();
-      cell.classList.toggle("hover");
-      cell.classList.toggle(`${player.piece}`);
-      if (!cell.textContent) {
-        // eslint-disable-next-line no-param-reassign
-        cell.textContent = `${player.piece}`;
-      } else {
-        // eslint-disable-next-line no-param-reassign
-        cell.textContent = "";
+      if (player.is !== ai.getAIPlayer()) {
+        cell.classList.toggle("hover");
+        cell.classList.toggle(`${player.piece}`);
+        if (!cell.textContent) {
+          // eslint-disable-next-line no-param-reassign
+          cell.textContent = `${player.piece}`;
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          cell.textContent = "";
+        }
       }
     }
   };
@@ -289,7 +412,11 @@ const displayGame = (() => {
         cell.dataset.column = columnIndex;
         cell.addEventListener("click", () => {
           handleCellClick(cell);
+          if (ai.getAIPlayer() !== 0) {
+            setTimeout(handleAIMove, 10);
+          }
         });
+
         cell.addEventListener("mouseover", () => {
           handleCellHover(cell);
         });
@@ -319,6 +446,9 @@ const displayGame = (() => {
       board.appendChild(cross);
     }
     container.appendChild(board);
+    if (ai.getAIPlayer() === 1) {
+      setTimeout(handleAIMove, 300);
+    }
   };
   const renderBoardControls = () => {
     const boardControls = document.createElement("div");
@@ -376,6 +506,7 @@ const displayGame = (() => {
     const playerName = document.createElement("input");
     const aiFlag = document.createElement("input");
     const difficultyButton = document.createElement("input");
+    const difficultyFlag = document.createElement("input");
     form.classList.add("player-form");
     form.setAttribute("id", `player-${player.is}`);
     playerName.setAttribute("name", "name");
@@ -385,19 +516,25 @@ const displayGame = (() => {
     aiFlag.setAttribute("name", "isAI");
     aiFlag.setAttribute("type", "hidden");
     aiFlag.setAttribute("value", true);
-    difficultyButton.setAttribute("name", "difficulty");
+    difficultyFlag.setAttribute("name", "difficulty");
+    difficultyFlag.setAttribute("type", "hidden");
+    difficultyFlag.setAttribute("value", "hard");
+    difficultyButton.setAttribute("name", "abc");
     difficultyButton.setAttribute("type", "button");
-    difficultyButton.setAttribute("value", "easy");
+    difficultyButton.setAttribute("value", "hard");
     difficultyButton.addEventListener("click", () => {
       switch (difficultyButton.getAttribute("value")) {
         case "easy":
           difficultyButton.setAttribute("value", "medium");
+          difficultyFlag.setAttribute("value", "medium");
           break;
         case "medium":
           difficultyButton.setAttribute("value", "hard");
+          difficultyFlag.setAttribute("value", "hard");
           break;
         case "hard":
           difficultyButton.setAttribute("value", "easy");
+          difficultyFlag.setAttribute("value", "easy");
           break;
         default:
       }
@@ -405,6 +542,7 @@ const displayGame = (() => {
     form.appendChild(playerName);
     form.appendChild(difficultyButton);
     form.appendChild(aiFlag);
+    form.appendChild(difficultyFlag);
     return form;
   };
 
@@ -432,9 +570,28 @@ const displayGame = (() => {
     const playerTwoForm = document.querySelector("form#player-2");
     const playerOneData = new FormData(playerOneForm);
     const playerTwoData = new FormData(playerTwoForm);
+
+    if (playerOneData.get("isAI") && playerTwoData.get("isAI")) {
+      ai.setAIPlayer(2, playerTwoData.get("difficulty"));
+      ticTacToe.setPlayerOne();
+      ticTacToe.setPlayerTwo(playerTwoData.get("name"));
+      return renderNewGame();
+    }
+    if (playerOneData.get("isAI") || playerTwoData.get("isAI")) {
+      if (playerOneData.get("isAI")) {
+        ai.setAIPlayer(1, playerOneData.get("difficulty"));
+      }
+      if (playerTwoData.get("isAI")) {
+        ai.setAIPlayer(2, playerTwoData.get("difficulty"));
+      }
+      ticTacToe.setPlayerOne(playerOneData.get("name"));
+      ticTacToe.setPlayerTwo(playerTwoData.get("name"));
+      return renderNewGame();
+    }
+    ai.setAIPlayer(0);
     ticTacToe.setPlayerOne(playerOneData.get("name"));
     ticTacToe.setPlayerTwo(playerTwoData.get("name"));
-    renderNewGame();
+    return renderNewGame();
   };
 
   const renderStartScreen = () => {
