@@ -124,14 +124,12 @@ const gameController = () => {
     return false;
   };
 
-  const setPlayerOne = (name, piece) => {
+  const setPlayerOne = (name = "Player One") => {
     playerOne.name = name;
-    playerOne.piece = piece;
     playerOne.score = 0;
   };
-  const setPlayerTwo = (name, piece) => {
+  const setPlayerTwo = (name = "Player Two") => {
     playerTwo.name = name;
-    playerTwo.piece = piece;
     playerTwo.score = 0;
   };
 
@@ -201,8 +199,6 @@ const gameController = () => {
 };
 
 // To do:
-// Change sides button
-// Win/Lose/Draw indicator
 // Move board to one array
 // AI
 const displayGame = (() => {
@@ -267,8 +263,7 @@ const displayGame = (() => {
       return renderScore();
     }
     if (ticTacToe.checkDraw()) {
-      addResultCover("draw");
-      return console.log("Draw");
+      return addResultCover("draw");
     }
     return false;
   };
@@ -363,6 +358,10 @@ const displayGame = (() => {
         toggleDisplayTurn();
       }
     });
+    exitButton.addEventListener("click", () => {
+      // eslint-disable-next-line no-use-before-define
+      renderStartScreen();
+    });
 
     boardControls.appendChild(exitButton);
     boardControls.appendChild(newMatchButton);
@@ -374,7 +373,139 @@ const displayGame = (() => {
     renderNewBoard();
     renderBoardControls();
   };
-  return { renderNewGame };
+
+  const renderPlayerForm = (player) => {
+    const form = document.createElement("form");
+    const playerName = document.createElement("input");
+    form.classList.add("player-form");
+    form.setAttribute("id", `player-${player.is}`);
+    playerName.setAttribute("name", "name");
+    playerName.setAttribute("type", "text");
+    playerName.setAttribute("value", `${player.name}`);
+    form.appendChild(playerName);
+    return form;
+  };
+
+  const renderAIForm = (player) => {
+    const form = document.createElement("form");
+    const playerName = document.createElement("input");
+    const aiFlag = document.createElement("input");
+    const difficultyButton = document.createElement("input");
+    form.classList.add("player-form");
+    form.setAttribute("id", `player-${player.is}`);
+    playerName.setAttribute("name", "name");
+    playerName.setAttribute("type", "text");
+    playerName.setAttribute("value", "Computer");
+    playerName.setAttribute("readonly", true);
+    aiFlag.setAttribute("name", "isAI");
+    aiFlag.setAttribute("type", "hidden");
+    aiFlag.setAttribute("value", true);
+    difficultyButton.setAttribute("name", "difficulty");
+    difficultyButton.setAttribute("type", "button");
+    difficultyButton.setAttribute("value", "easy");
+    difficultyButton.addEventListener("click", () => {
+      switch (difficultyButton.getAttribute("value")) {
+        case "easy":
+          difficultyButton.setAttribute("value", "medium");
+          break;
+        case "medium":
+          difficultyButton.setAttribute("value", "hard");
+          break;
+        case "hard":
+          difficultyButton.setAttribute("value", "easy");
+          break;
+        default:
+      }
+    });
+    form.appendChild(playerName);
+    form.appendChild(difficultyButton);
+    form.appendChild(aiFlag);
+    return form;
+  };
+
+  const handlePlayerToggle = (
+    clickedButton,
+    playerToggle,
+    aiToggle,
+    player,
+    formContainer
+  ) => {
+    if (clickedButton.classList.contains("active")) return false;
+    aiToggle.classList.toggle("active");
+    playerToggle.classList.toggle("active");
+    const form = formContainer.querySelector("form");
+    if (clickedButton.classList.contains("ai")) {
+      form.replaceWith(renderAIForm(player));
+    } else {
+      form.replaceWith(renderPlayerForm(player));
+    }
+    return true;
+  };
+
+  const handleStartButton = () => {
+    const playerOneForm = document.querySelector("form#player-1");
+    const playerTwoForm = document.querySelector("form#player-2");
+    const playerOneData = new FormData(playerOneForm);
+    const playerTwoData = new FormData(playerTwoForm);
+    ticTacToe.setPlayerOne(playerOneData.get("name"));
+    ticTacToe.setPlayerTwo(playerTwoData.get("name"));
+    renderNewGame();
+  };
+
+  const renderStartScreen = () => {
+    container.textContent = "";
+    ticTacToe.setPlayerOne();
+    ticTacToe.setPlayerTwo();
+    const selectContainer = document.createElement("div");
+    const playerOne = ticTacToe.getPlayerOne();
+    const playerTwo = ticTacToe.getPlayerTwo();
+    const title = document.createElement("h1");
+    title.classList.add("title");
+    title.textContent = "Tic Tac Toe";
+    selectContainer.appendChild(title);
+    [playerOne, playerTwo].forEach((player) => {
+      const formContainer = document.createElement("div");
+      const token = document.createElement("div");
+      formContainer.classList.add("form-container");
+      formContainer.classList.add(`player-${player.is}`);
+      token.classList.add("select-screen-token");
+      token.classList.add(`${player.piece}`);
+      token.textContent = `${player.piece}`;
+      formContainer.appendChild(token);
+      formContainer.appendChild(renderPlayerForm(player));
+
+      const playerToggle = document.createElement("button");
+      const aiToggle = document.createElement("button");
+      playerToggle.classList.add("player");
+      playerToggle.classList.add("active");
+      playerToggle.textContent = "Player";
+      aiToggle.classList.add("ai");
+      aiToggle.textContent = "Computer";
+      [playerToggle, aiToggle].forEach((button) => {
+        button.addEventListener("click", function playerAIToggleClick() {
+          handlePlayerToggle(
+            this,
+            playerToggle,
+            aiToggle,
+            player,
+            formContainer
+          );
+        });
+        formContainer.appendChild(button);
+      });
+      selectContainer.appendChild(formContainer);
+    });
+    selectContainer.classList.add("start-screen");
+    const startButton = document.createElement("button");
+    startButton.classList.add("start-button");
+    startButton.textContent = "start";
+    startButton.addEventListener("click", () => {
+      handleStartButton();
+    });
+    selectContainer.appendChild(startButton);
+    container.appendChild(selectContainer);
+  };
+  return { renderNewGame, renderStartScreen };
 })();
 
 displayGame.renderNewGame();
