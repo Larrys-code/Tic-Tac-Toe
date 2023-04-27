@@ -4,40 +4,28 @@ const gameBoard = () => {
     [0, 0, 0],
     [0, 0, 0],
   ];
-  const playerOne = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
-  ];
-  const playerTwo = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
-  ];
   const checkLegal = (row, column) => {
     const boardRow = board[row];
     const boardCell = boardRow[column];
     if (boardCell === 0) return true;
     return false;
   };
-  const insertPiece = (boardArray, row, column) => {
+  const insertPiece = (boardArray, row, column, piece) => {
     const boardRow = boardArray[row];
-    boardRow.splice(column, 1, 1);
+    boardRow.splice(column, 1, piece);
   };
   const playLegalMove = (row, column, firstPlayer = true) => {
     if (!checkLegal(row, column)) return false;
-    insertPiece(board, row, column);
     if (firstPlayer) {
-      insertPiece(playerOne, row, column);
+      insertPiece(board, row, column, 1);
     } else {
-      insertPiece(playerTwo, row, column);
+      insertPiece(board, row, column, 2);
     }
     return true;
   };
-  const getRawBoard = () => board;
-  const getPOne = () => playerOne;
-  const getPTwo = () => playerTwo;
-  return { getRawBoard, getPOne, getPTwo, playLegalMove, checkLegal };
+  const getBoard = () => board;
+
+  return { getBoard, playLegalMove, checkLegal };
 };
 
 const gameController = () => {
@@ -137,37 +125,31 @@ const gameController = () => {
   const getPlayerTwo = () => playerTwo;
 
   const getBoard = () => {
-    const fullBoard = board.getRawBoard();
-    const playerTwoBoard = board.getPTwo();
-    fullBoard.forEach((row, rowIndex) => {
-      const playerTwoRow = playerTwoBoard[rowIndex];
-      row.forEach((cell, columnIndex) => {
-        if (cell === 1 && cell === playerTwoRow[columnIndex])
-          row.splice(columnIndex, 1, 2);
-      });
-    });
+    const fullBoard = board.getBoard();
     return fullBoard;
   };
 
   const checkDraw = () => {
-    const rawBoard = board.getRawBoard();
-    if (rawBoard.every((row) => row.every((cell) => cell === 1))) return true;
+    const rawBoard = board.getBoard();
+    if (rawBoard.every((row) => row.every((cell) => cell === 1 || cell === 2)))
+      return true;
     return false;
   };
 
   const checkWin = () => {
-    const players = [
-      [playerOne, board.getPOne()],
-      [playerTwo, board.getPTwo()],
-    ];
+    const players = [playerOne, playerTwo];
+    const rawBoard = board.getBoard();
     const winner = [];
-    players.forEach((playerArray) => {
-      const playerBoard = playerArray[1];
+    players.forEach((player) => {
+      const playerNumber = player.is;
       const winStates = JSON.parse(JSON.stringify(winningStates));
       winStates.forEach((winState) => {
         winState.forEach((winStateRow, rowIndex) => {
           winStateRow.forEach((cell, columnIndex) => {
-            if (cell === 1 && playerBoard[rowIndex][columnIndex] === 1) {
+            if (
+              cell === 1 &&
+              rawBoard[rowIndex][columnIndex] === playerNumber
+            ) {
               winStateRow.splice(columnIndex, 1, 0);
             }
           });
@@ -178,7 +160,7 @@ const gameController = () => {
           winState.every((row) => row.every((cell) => cell === 0))
         )
       )
-        winner.push(playerArray[0]);
+        winner.push(player);
     });
     if (winner[0]) return winner[0];
     return false;
