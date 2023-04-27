@@ -508,4 +508,4 @@ const displayGame = (() => {
   return { renderNewGame, renderStartScreen };
 })();
 
-displayGame.renderNewGame();
+displayGame.renderStartScreen();
