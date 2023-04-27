@@ -271,6 +271,7 @@ const displayGame = (() => {
     const { row, column } = cell.dataset;
     const player = ticTacToe.whosTurn();
     if (ticTacToe.playTurn(row, column)) {
+      // eslint-disable-next-line no-param-reassign
       cell.textContent = `${player.piece}`;
       cell.classList.remove("hover");
       cell.classList.add("filled");
@@ -285,8 +286,10 @@ const displayGame = (() => {
       cell.classList.toggle("hover");
       cell.classList.toggle(`${player.piece}`);
       if (!cell.textContent) {
+        // eslint-disable-next-line no-param-reassign
         cell.textContent = `${player.piece}`;
       } else {
+        // eslint-disable-next-line no-param-reassign
         cell.textContent = "";
       }
     }
