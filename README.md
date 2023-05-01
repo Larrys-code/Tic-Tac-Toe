@@ -100,7 +100,7 @@ Normal and Easy difficulty both work as intended but would need adjustments to b
 ## Acknowledgments
 
 * This project was completed as a part of [*"The Odin Project"*.](odin-url)
-* The font used for the UI and pieces is [*"Dongle"* on fonts.google.com under the Open Font Licence](https://fonts.google.com/specimen/Dongle)
+* The font used for the UI and pieces is [*"Dongle"* on fonts.google.com under the Open Font Licence.](https://fonts.google.com/specimen/Dongle)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
